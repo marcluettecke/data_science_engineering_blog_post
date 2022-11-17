@@ -45,7 +45,6 @@ class DataCleaning:
                                                   cols_training-1:cols_training]
         self.y_test = self.test_data.iloc[:, cols_test-1:cols_test]
 
-        # convert to numpy arrays and initalize the parameter array theta
         self.X_training = np.array(self.X_training.values)
         self.X_test = np.array(self.X_test.values)
         self.y_training = np.array(self.y_training.values)
