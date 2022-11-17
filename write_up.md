@@ -134,29 +134,6 @@ The **gradient function** fine-tunes the model parameters (which weight to assig
 
 ---
 
-<!-- So, to make the vectorized computation easier, let us do some clean up:
-
-```python
-# add an additional column of ones to simplify the matrix multiplication
-training.insert(0, 'Ones', 1)
-test.insert(0, 'Ones', 1)
-
-# set X (training data) and y (target variable)
-cols_training = training.shape[1]
-cols_test = test.shape[1]
-X_training = training.iloc[:,0:cols_training-1]
-X_test = training.iloc[:,0:cols_test-1]
-y_training = training.iloc[:,cols_training-1:cols_training]
-y_test = training.iloc[:,cols_test-1:cols_test]
-
-# convert to numpy arrays and initalize the parameter array theta
-X_training = np.array(X_training.values)
-X_test = np.array(X_test.values)
-y_training = np.array(y_training.values)
-y_test = np.array(y_test.values)
-theta = np.zeros(3)
-``` -->
-
 We can now define our gradient function to iterate through the data and - for the sake of simplicity - leverage a popular Python library to update the model parameters using the gradient function we define as:
 
 ```python
@@ -390,9 +367,9 @@ The main benefits, which I tried to illustrate along a simple classification pro
 - distinct classes with often a singular purpose can be tested and extended easily (in comparison to prevalent notebook approaches in Data Science)
 - you never know how and when a model will become more complex. Even our toy example could be split up into five sequentially operating modules. All of these steps allow for many other approaches to how to retrieve the data, to which model to apply, and how to benchmark it. Our system enabled easy extensions for feasible alternatives
 
-There is a definite use-case for prototyping in Jupyter notebook, which proves especially useful in a rudimentary presentation of results to an uninformed audience.
+There is a definite use case for prototyping in the Jupyter notebook, which proves especially useful in an introductory presentation of results to an uninformed audience.
 
-But, if the goal is to build solutions to complex problems in teams that will benefit from a predefined code quality, working in designated Python modules and following industry-proven Software Engineering principles, will help a lot.
+But, if the goal is to build solutions to complex problems in teams that will benefit from a predefined code quality, working in designated Python modules and following industry-proven Software Engineering principles will greatly help.
 
 [^1]: For the sake of the example, let us assume that these are test exams, which do not fully determine if a student passes by themselves. Otherwise, this would not be a statistical but a purely additive, i.e., deterministic exercise.
 [^2]: Technically, this so-called _co-variance_ between the individual predictors is not ideal. We would want to add factors to our model that are highly explicative of the dependent variable but are agnostic (independent) of each other.
