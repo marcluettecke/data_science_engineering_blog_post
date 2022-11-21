@@ -16,27 +16,24 @@ About ten years ago, Harvard Business Review coined Data Scientist ["the sexiest
 
 ## But wait, what exactly is Data Science
 
-Even defining the field with a single sentence leads to necessary oversimplifications. Most practitioners can somehow agree on the following Venn diagram of core expertise within Data Science:
+Even defining the field with a single sentence leads to necessary oversimplifications. Most practitioners cannot fully agree on a clear definition of Data Science, while the subfield of Machine Learning finds a clearer description - as demonstrated by [IBM's definition](https://www.ibm.com/cloud/learn/machine-learning):
 
-<div style="display: flex; flex-direction: column;  align-items: center; text-align: center">
-    <img src="https://www.researchgate.net/publication/281117886/figure/fig1/AS:669045468721163@1536524278694/The-Data-Science-Venn-Diagram.png" alt="Data Science Venn Diagram" width="500px"/>
-    <p>Source: <a href="https://www.researchgate.net/figure/The-Data-Science-Venn-Diagram_fig1_281117886">The Data Science Venn Diagram</a></p>
-</div>
+> <cite>Machine learning is a branch of artificial intelligence (AI) and computer science which focuses on the use of data and algorithms to imitate the way that humans learn, gradually improving its accuracy.</cite>
 
 While diversity drives innovation, a heterogeneous field of practitioners toughens the introduction of best practices. After all, the daily challenges of a political researcher investigating voting patterns diverge strongly from a development team fine-tuning face recognition techniques for your smartphone.
 Where does this lead us as engineers, either working on a Data Science task or interacting with code that has to meet the requirements of scalable production code? Often with a disconnect between domain/ statistics expertise and best practices in Computer Science.
 
 ## So, why should we care?
 
-Data Scientists have successfully contributed to some of the most exciting inventions of the last decades - and many Data Scientists within IT departments already utilize the toolset of software engineers...?
+Data Scientists have successfully contributed to some of the most exciting inventions of the last decades - and many Data Scientists within IT departments already utilize the toolset of software engineers.
 
-Because a lot of researchers, especially the ones not trained as traditional Software Engineers, might even be oblivious to the streamlined approach that many IT projects take. Writing tests, scaling code for high user numbers, outsourcing computing powers to cloud servers, documenting the work, or code modularization represent just a few examples that might make the life of a Data Scientist easier.
+Nevertheless, many researchers, especially the ones not trained as traditional Software Engineers, might even be oblivious to the streamlined approach many IT projects follow. Writing tests, scaling code for high user numbers, outsourcing computing powers to cloud servers, documenting the work, or code modularization represent just a few examples that might make the life of a Data Scientist easier.
 
 But while abstract concepts are excellent in theory, let us tackle a simple problem in two ways: First, how a small team of Data Scientists might explore. Second,re-approaching it as a Software Engineer, keeping some best practices in mind.
 
 ## Let us look at it in action - two case studies
 
-We will illustrate the diverging approaches with a simple prediction task: Given two exam scores, how likely a student is to pass a given class[^1].
+We will illustrate the diverging approaches with a simple prediction task: Given two exam scores, how likely a student is to pass or fail a given class[^1].
 
 ### The data
 
@@ -63,7 +60,7 @@ data.shape()
 
 We can see the first five observations of the data and the overall shape of the data: (100, 3).
 
-We do not want to train our model on the same data that we will eventually benchmark it against, so we need to split the data into a training and a test data set - we will aim for a standard 80:20 split.
+Training and testing the data on the same observations lead to unrepresentative self-fulfilling prophecies, so we need to split the data into training and test data sets - we will aim for a standard 80:20 split.
 
 ```python
 training = data[:80]
@@ -92,51 +89,21 @@ But how to best quantify this notion? We will use a _logistic regression_ model 
 Oh, oh, statistics...
 
 <div style="display: flex; flex-direction: column;  align-items: center; text-align: center">
-    <img src="https://i.ibb.co/LSyTGJb/log-reg-meme.jpg" alt="logistic regression meme" width="600px"/>
+    <img src="https://i.ibb.co/7yknpsw/log-meme.jpg" alt="logistic regression meme" width="600px"/>
 </div>
 
----
+Laying out the detailed derivation of the model will bore you and will not contribute much to the overall intent of the blog post. Just take the following building blogs with you, so the general approach is straightforward: we try to model a complex interplay of factors with a simplified representation of reality. This building blog is called **a model**. In our case, we choose a mathematical relationship that helps us to translate continuous input variables, as in exam scores, to a binary (yes or no) outcome; this building blog is called [**a logistic regression**](https://en.wikipedia.org/wiki/Logistic_regression).
 
-### Technical aside: **Logistic regression**
+For our model to learn from data, we will use the toolset of Machine Learning, which over many iterations of observations, helps us to understand how important the exam scores are for the probability of passing the class. We call that _finding the parameter weights of the input features_.
 
-So, a model to predict a binary outcome (read here: yes or no / 1 or 0 / pass and not pass) will need to map some mathematical result to a binary outcome variable. Therefore, it will usually map values above a threshold to one. This result space represents the main difference from the more popular linear regression, where the result displays a continuous range. In the case of logistic regression, the mapping function takes on the form of a sigmoid function, with z representing the linear model: $z = \beta_0 + \beta_1 \Chi$:
+To iterate over the data, we use an approach called [**Gradient Descent**](https://en.wikipedia.org/wiki/Gradient_descent) that tries to minimize some cost function - how far we are off are predicted and actual outcomes and leads us to **optimal** model parameters.
 
-<div style="display: flex; flex-direction: column;  align-items: center; text-align: center">
-    <img src="https://i.ibb.co/dPBY1Hp/sigmoid-function.webp" alt="sigmoid function" width="750px"/>
-    <p>Source: <a href="https://towardsdatascience.com/logistic-regression-a-simplified-approach-using-python-c4bc81a87c31">Logistic Regression - A simplified approach using python</a></p>
-</div>
-
----
-
-That is enough theory for now. Let us continue with the more exciting implementation and define the above sigmoid function in code:
+Let us look at the actual code. We can now define our gradient function to iterate through the data and - for the sake of simplicity - leverage a popular Python library to update the model parameters using the gradient function we define as:
 
 ```python
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
-```
 
-We need to do some data cleanup and define a cost function. What is a cost function, you ask?
-
----
-
-### Technical aside: **Cost functions in Machine Learning**
-
-Machine Learning means that our model learns from the data - but how? Well, by iterating over the observations and optimizing the parameters accordingly. Two main ingredients determine how far and in which direction the model moves: the **gradient** and **cost** functions.
-
-The **cost function** tells us how wrong a certain model prediction is, given a set of model parameters.
-
-The **gradient function** fine-tunes the model parameters (which weight to assign the first and second exam score, for example) by not just randomly plotting in numbers. It systematically moves towards a point minimizing the cost function - I will refrain from the calculus to find the derivative of the cost function here, but you get the gist of it.
-
-<div style="display: flex; flex-direction: column;  align-items: center; text-align: center">
-    <img src="https://i.ibb.co/F7dwLSJ/gradient-descent.webp" alt="gradient descent" width="550px"/>
-    <p>Source: <a href="https://ml-cheatsheet.readthedocs.io/en/latest/gradient_descent.html">ML Cheatsheet: Gradient Descent</a></p>
-</div>
-
----
-
-We can now define our gradient function to iterate through the data and - for the sake of simplicity - leverage a popular Python library to update the model parameters using the gradient function we define as:
-
-```python
 def gradient(theta, X, y):
     theta = np.matrix(theta)
     X = np.matrix(X)
@@ -180,7 +147,7 @@ correct = [1 if ((a == 1 and b == 1) or (a == 0 and b == 0)) else 0 for (a, b) i
 accuracy = (sum(map(int, correct)) % len(correct))
 ```
 
-This model correctly predicts 90% of our test data observations, which is great, assuming that the test and the training data are from the same population. Still, the model has only learned from the entirely independent observations of the training data.
+This model correctly predicts 90% of observations within the previously unseen test data set.
 
 ## Approach 2: The Software Engineer
 
@@ -212,7 +179,7 @@ Code modularization has come up several times in this text, but what does it mea
     <img src="https://i.ibb.co/Jt6v3Nr/folder-structure.png" alt="folder structure" width="250px"/>
 </div>
 
-Why would we want to extend our nice single Jupyter notebook to this abomination of a project? Because it nicely separates code into separate components!
+Why would we want to extend our nice single Jupyter notebook to this abomination of a project? Because it nicely separates code into distinct components!
 
 Let us look at it step by step; the main magic happens in the `main.py` file, which calls all other files to do certain functionalities. So, for example, to load the data from an arbitrary backend server, or in our simplified case, from a local file, we call:
 
@@ -223,7 +190,7 @@ loader_instance = DataLoading('./data/exam_data.txt')
 DataLoading.load_data_to_pd(loader_instance, None, ['Exam1', 'Exam2', 'Pass'])
 ```
 
-Easy, right? We can achieve this behavior because, as Software Engineers, we have extracted the unorganized cells of the notebook into bundled python classes:
+Easy, right? We can achieve this behavior because, as Software Engineers, we have extracted the unorganized cells of the notebook into bundled python classes[^5]:
 
 ```python
 import pandas as pd
@@ -232,8 +199,7 @@ class DataLoading:
     """Class to load the data from an arbitrary path
 
     Args:
-        path (string): String argument that holds the path (web or local) to load the data - here just for .csv files -
-        can be extended to other file types
+        path (string): String argument that holds the path (web or local) to load the data - here just for .csv files - can be extended to other file types
     """
 
     def __init__(self, path) -> None:
@@ -353,25 +319,27 @@ class DataCleaning:
 
 This slightly longer class includes all the necessary steps for us to wrangle the data and prepare if for the upcoming modeling steps. We have a clear separation of concerns between the simple functionality to split the data set into training and test data, reshaping its dimensions for the vector operations, and initializing our parameter vector theta.
 
-Testing these methods becomes much more accessible and will be naturally well-documented:
+Testing these methods becomes much more accessible and will be naturally well-documented. Important to distinguish here are software tests of [training and inference code](https://blogs.nvidia.com/blog/2016/08/22/difference-deep-learning-training-inference-ai/): Training code tests fall under the responsibility of the Machine Learn practitioner - how does the model run, where can we fine-tune parameters, etc. The more impactful side of the coin will be how the model changes the product and user experience through its inferences. Therefore, streamlined standards for these tests will ensure high code quality and maintainability of the code base.
+
 These functionalities go hand in hand with the usual benefits of modularized python projects, such as virtual environments with a clearly defined dependency management via a `requirements.txt` file.
 
 ## Where does that leave us, and what to do from here?
 
-We have explored how Data Science has become one of the professional trends of the 21st century that will not fade away anytime soon. While it has brought remarkable advances in technology, its diverse problem space creates a conundrum of best practices to follow.
-I propose that Software Engineering's approach to problems proves useful for Data Scientist, who is aiming for scalable and testable production level code.
+We have explored how Data Science has become one of the professional trends of the 21st century that will not fade away anytime soon. While it has brought remarkable technological advances, its diverse problem space creates a conundrum of best practices to follow.
+I propose that Software Engineering's approach to problems proves useful for Data Scientist aiming for scalable and testable production-level code.
 
 The main benefits, which I tried to illustrate along a simple classification problem, are that:
 
 - modularized Python code is more straightforwardly maintained, explored, and collaborated on
 - distinct classes with often a singular purpose can be tested and extended easily (in comparison to prevalent notebook approaches in Data Science)
-- you never know how and when a model will become more complex. Even our toy example could be split up into five sequentially operating modules. All of these steps allow for many other approaches to how to retrieve the data, to which model to apply, and how to benchmark it. Our system enabled easy extensions for feasible alternatives
+- you never know how and when a model will become more complex. We could even split up our toy example into five sequentially operating modules. These steps allow for many other approaches to retrieving the data, which model to apply, and how to benchmark it. Our system enabled easy extensions for feasible alternatives
 
-There is a definite use case for prototyping in the Jupyter notebook, which proves especially useful in an introductory presentation of results to an uninformed audience.
+There is a definite use case for [prototyping in the Jupyter notebook](https://engineering.leanix.net/blog/jupyter-notebooks-are-a-shell-replacement/), which proves especially useful in an introductory presentation of results to an uninformed audience.
 
-But, if the goal is to build solutions to complex problems in teams that will benefit from a predefined code quality, working in designated Python modules and following industry-proven Software Engineering principles will greatly help.
+But, if the goal is to build solutions to complex problems in teams that will benefit from a predefined code quality, working in designated Python modules and following industry-proven Software Engineering principles will significantly help.
 
 [^1]: For the sake of the example, let us assume that these are test exams, which do not fully determine if a student passes by themselves. Otherwise, this would not be a statistical but a purely additive, i.e., deterministic exercise.
 [^2]: Technically, this so-called _co-variance_ between the individual predictors is not ideal. We would want to add factors to our model that are highly explicative of the dependent variable but are agnostic (independent) of each other.
 [^3]: This approach might be overkill for this particular scenario of a quick logistic regression. But, if we wanted to compare multiple models, add tests for all helper functions, and see this as a starting point, a clear distinction between the functionalities within small-scoped classes might simplify the code.
 [^4]: Tests are added for the loader and cleaner classes for illustrative purposes. In a production-level scenario, one might consider writing the tests before the actual code, following the so-called [TDD - Test-Driven-Development](https://en.wikipedia.org/wiki/Test-driven_development).
+[^5]: The alternative to classes would be stateless modules, which in this use case might even be more appropriate because our pipeline does not depend on any features for which software classes are beneficial - statefulness, hierarchical inheritance, etc. Still, classes, as a cornerstone of Object Oriented way to structure code, make this short introduction more accessible to the diverse background of software engineers not familiar with Python syntax or language-specific intricacies.
